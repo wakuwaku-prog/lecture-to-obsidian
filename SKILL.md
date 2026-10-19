@@ -84,7 +84,12 @@ python "$SKILL/scripts/build_vault_profile.py" "<vault root>" -o "<vault root>/_
 
 - **Canvas 采集调用它，不复制它的脚本。** 它的 **11 个脚本**（`download_ppt` / `extract_ppt_scenes` / `extract_ppt_frames` / `ocr_slides` / `read_slide_pageno` / `dedupe_slides` / `transcribe_class` / `diarize_transcript` / `scene_times` + 两个校验器）是既有资产；本 skill 的 `adapters/canvas.py` 只做编排与契约转换。
 - **超星采集在本 skill 内**（`adapters/chaoxing.py`），因为它的链路与 Canvas 完全不同：没有平台 PPT 轨、没有可用字幕、且有任务点风险。
-- 它的 `docs/OBSIDIAN-NOTES.md`（182 行「从素材到笔记」完整流程）、`docs/WORKFLOW.md` 与 3 个笔记模板，**上游仓库里是有的，但本机这份安装没装全**（2026-10-19 去 GitHub 核实）。本 skill 的 `references/` 与 `templates/` 已覆盖同等内容；**整理笔记前值得把上游那份拉下来对照**，它在文件命名（`PPT p## — Topic (第N节 MMSS).jpg`）与「三件套」写法上写得更细。
+- **它自己也有整理到知识库的部分，而且写得比本 skill 更细——先读它，再读本 skill 的 L2。**
+  - `docs/OBSIDIAN-NOTES.md`（182 行）：「从素材到笔记」完整流程 —— 附件命名、Source Register 登记、三件套写法、内嵌图与表格转义、页码三态、概念页与索引、11 项收尾自查、7 条常见错误。
+  - `docs/WORKFLOW.md`（11 KB）：端到端操作 —— 定位课程与节次、**探测 `pptShow`**、路径 A/B、转写与说话人、§4 配合 Obsidian 知识库。
+  - `templates/`：L / P / V 三份笔记骨架。
+  - ⚠️ 这三者**原先本机没装**（2026-10-19 去 GitHub 核实：远端仓库有，本地只装了 `SKILL.md` + `scripts/`）。**现已补齐并逐个通过 git blob SHA 校验**（`c2c20f65` / `a2c2b712` / `29328590` / `63944126` / `16e0aa21`）。若换机器重装，记得连 `docs/` 与 `templates/` 一起装。
+- **两处有意分歧，以目标库为准**：它主张 P+V+L **每课都建**（本 skill 的 V 按需，因心理库 AGENTS.md §9 明确「V## 仅在需要回放复核时建立」）；它的页图命名是 `PPT p## — Topic (第N节 MMSS).jpg`（本 skill 的 PDF 路径用 `PDF pNN.jpg`，与心理库实际文件一致）。
 
 **何时该把 `adapters/` 拆成独立 skill**：当采集需要覆盖第二所学校，或出现第三个平台时。在那之前，一个 skill 更好——五层共享同一份契约，拆开必然出现「上游改了字段、下游静默错」。
 

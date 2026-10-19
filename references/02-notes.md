@@ -2,6 +2,8 @@
 
 本层把 **manifest**（采集层唯一出口）变成**知识库里能复习的东西**，并按目标库画像落盘。
 
+> **先读上游那份**：`~/.dsh/skills/better-awesome-sjtu-canvas-ppt/docs/OBSIDIAN-NOTES.md`（182 行「从素材到笔记」完整流程）+ `templates/`（L/P/V 三份骨架）。**它比本文件更细**，尤其附件命名、Source Register 登记、三件套写法与 11 项收尾自查。本文件只补充**本 skill 特有的部分**：画像机制、契约、生成器行为与踩坑。两者冲突时以**目标库 `AGENTS.md`** 为准。
+
 ```
 manifest.json + vault-profile.json
         │
