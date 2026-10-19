@@ -1,7 +1,11 @@
 # 05 · L5 质量门
 
-> 任一红即未交付。四个本 skill 的校验器 + **复用** `better-awesome-sjtu-canvas-ppt`
-> 的两个既有校验器，全部**只读**：不写、不改、不创建任何文件。
+> 任一红即未交付。本 skill 只拥有 `html-assets` 一项；另外五行查的是
+> `better-awesome-sjtu-canvas-ppt` 的产物与它提供的复用校验器。
+> 全部**只读**：不写、不改、不创建任何文件。
+>
+> ⚠️ **题库规则不在这六行里**。`check_all.py` 没有 `quiz` 行，`check_quiz_rules.py`
+> 必须单独跑——**「总门 PASS」不等于「题库合规」**。详见 `docs/PLAN.md` §14。
 
 ```bash
 SKILL="$HOME/.dsh/skills/lecture-to-obsidian"
@@ -111,8 +115,8 @@ python "$SKILL/scripts/check_all.py" --vault "<心理库>" --quiet
 ### 1.1 `check_manifest.py` — 素材清单自洽
 
 ```bash
-python "$SKILL/scripts/check_manifest.py" "<work>/manifest.json" \
-       [--schema "$SKILL/schemas/manifest.schema.json"] [--quiet] [--json]
+python "$SKILL/better-awesome-sjtu-canvas-ppt/scripts/check_manifest.py" "<work>/manifest.json" \
+       [--schema "$SKILL/better-awesome-sjtu-canvas-ppt/schemas/manifest.schema.json"] [--quiet] [--json]
 ```
 
 退出码 `0` = 无 ERROR，`1` = 有 ERROR。
@@ -226,7 +230,7 @@ python "$SKILL/scripts/check_builder_alignment.py" [--scripts DIR]
 ### 1.3 `check_vault_profile.py` — 知识库画像
 
 ```bash
-python "$SKILL/scripts/check_vault_profile.py" "<vault>/_scripts/vault-profile.json" \
+python "$SKILL/better-awesome-sjtu-canvas-ppt/scripts/check_vault_profile.py" "<vault>/_scripts/vault-profile.json" \
        [--vault DIR] [--lenient-dirs] [--quiet] [--json]
 ```
 
@@ -257,7 +261,7 @@ STATUS 取值 `OK` / `WARN` / `FAIL` / `SKIP`；`WARN` 不导致退出 1。
 ### 1.5 `check_note_frontmatter.py` — 画像驱动的必填字段 + 结构
 
 ```bash
-python "$SKILL/scripts/check_note_frontmatter.py" --profile "<vault-profile.json>" \
+python "$SKILL/better-awesome-sjtu-canvas-ppt/scripts/check_note_frontmatter.py" --profile "<vault-profile.json>" \
        [--vault DIR] [--quiet] [--json]
 ```
 
@@ -582,7 +586,7 @@ note-structure    FAIL    demoted=21 errors=1 notes=14
 > **真实画像对心理库用 `heading-alias`** —— 所以真实画像下 L02/L08 缺总结小节
 > 会照常报 ERROR（那是真问题，见 §1.5 的更正）。
 
-### 真实画像的端到端实测（`docs/pilot/e2e-L08/vault-profile.json`）
+### 真实画像的端到端实测（`better-awesome-sjtu-canvas-ppt/docs/pilot/e2e-L08/vault-profile.json`）
 
 ```
 检查项 61 条；ERROR 2，WARN 1，INFO 26
@@ -679,7 +683,7 @@ L02 / L03 / L04 / L05 / L06 / L07 / L08 **全部 PASS**（ERROR 0）。
 L03 与 L07 各 1 条 WARN：页面没写「内嵌 N 张」声明，无法核对图数
 （可用 `--declared-images` 补）。
 
-### 基准样本 `docs/pilot/L08.manifest.json`
+### 基准样本 `better-awesome-sjtu-canvas-ppt/docs/pilot/L08.manifest.json`
 
 ```
 检查项 537 条；ERROR 0，WARN 1，INFO 15

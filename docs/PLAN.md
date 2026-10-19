@@ -68,11 +68,11 @@
 ## 4. 架构
 
 ```
-L0 采集适配层    adapters/{canvas,chaoxing,pdf}.py   ← 唯一按平台变化的地方
+L0 采集适配层    better-awesome-sjtu-canvas-ppt/adapters/{canvas,chaoxing,pdf}.py   ← 唯一按平台变化的地方
         ↓
-L1 素材 manifest  schemas/manifest.schema.json       ← 契约单点
+L1 素材 manifest  better-awesome-sjtu-canvas-ppt/schemas/manifest.schema.json       ← 契约单点
         ↓
-L2 知识库画像     schemas/vault-profile.schema.json   ← 库差异单点
+L2 知识库画像     better-awesome-sjtu-canvas-ppt/schemas/vault-profile.schema.json   ← 库差异单点
    + 笔记         L## / P## / V##(按需) / Concept —
         ↓
 L3 讲解           md 真源（证据标记 + 配图）
@@ -271,9 +271,9 @@ L5 质量门         check_all.py（链接/结构/出题/HTML资产/manifest/Git
 | 阶段 | 产出 | 验收标准 |
 |---|---|---|
 | **P0 骨架与契约** | `SKILL.md`、三份 schema、`references/00-pipeline.md`、`docs/PLAN.md` | skill 能被加载并路由；三份 schema 通过 JSON Schema 校验；任一 reference 单独读得懂 |
-| **P1 Canvas 适配** | `adapters/canvas.py`、`references/01-acquisition.md`、`scripts/build_manifest.py` | 对心理库 L08 生成合法 `manifest.json`；页图↔时间码一一对应 |
-| **P2 超星适配** | `adapters/chaoxing.py` | 对有有机化学某一节跑通 discovery → 直链；**全程无播放、无心跳** |
-| **P3 笔记生成** | `references/02-notes.md`、`templates/*.md`、`scripts/gen_notes.py`、`build_vault_profile.py` | L08 产出 L/P 笔记；`check_vault_links` + `check_note_structure` 全过 |
+| **P1 Canvas 适配** | `better-awesome-sjtu-canvas-ppt/adapters/canvas.py`、`better-awesome-sjtu-canvas-ppt/docs/ACQUISITION.md`、`better-awesome-sjtu-canvas-ppt/scripts/build_manifest.py` | 对心理库 L08 生成合法 `manifest.json`；页图↔时间码一一对应 |
+| **P2 超星适配** | `better-awesome-sjtu-canvas-ppt/adapters/chaoxing.py` | 对有有机化学某一节跑通 discovery → 直链；**全程无播放、无心跳** |
+| **P3 笔记生成** | `better-awesome-sjtu-canvas-ppt/docs/OBSIDIAN-NOTES.md`、`templates/*.md`、`better-awesome-sjtu-canvas-ppt/scripts/gen_notes.py`、`build_vault_profile.py` | L08 产出 L/P 笔记；`check_vault_links` + `check_note_structure` 全过 |
 | **P4 讲解** | `references/03-explainer.md`、`templates/explainer.html`、`build_explainer_html.py` | L08 md 真源 → 单文件 HTML；`check_html_assets` 全过；430 px 视口无横向溢出 |
 | **P5 考题** | `references/04-quiz.md`、`schemas/quiz-bank.schema.json`、`gen_quiz_bank.py`、`check_quiz_rules.py` | L08 题库 JSON 能被 `刷题工具/开始刷题.html` 导入且判分正确；出题规则全过 |
 | **P6 质量门** | `check_all.py`、`check_manifest.py`、`check_vault_profile.py` | 一次调用跑完全部门；L08 端到端全绿 |
@@ -342,7 +342,7 @@ L5 质量门         check_all.py（链接/结构/出题/HTML资产/manifest/Git
 
 **方法**：在写任何采集/生成代码之前，先用手工造的 L08 `manifest.json` 去压 schema。凡是 schema 表达不了的，就是契约错了。五处全部命中——如果等代码写完才发现，就要返工五层。
 
-基准 fixture：`docs/pilot/L08.manifest.json`（35 页 / 2 节次 / 38 条放映记录，已通过 `manifest.schema.json` 校验；数据全部取自 P08 的放映记录表与页脚对照表）。
+基准 fixture：`better-awesome-sjtu-canvas-ppt/docs/pilot/L08.manifest.json`（35 页 / 2 节次 / 38 条放映记录，已通过 `manifest.schema.json` 校验；数据全部取自 P08 的放映记录表与页脚对照表）。
 
 | # | 我原本的假设 | L08 的真实素材 | 契约改成 |
 |---|---|---|---|
@@ -358,7 +358,7 @@ L5 质量门         check_all.py（链接/结构/出题/HTML资产/manifest/Git
 
 ## 12.6 端到端试点结果（L08，2026-10-19）
 
-产物落在 `docs/pilot/e2e-L08/`（可复核、可重跑）：
+产物落在 `better-awesome-sjtu-canvas-ppt/docs/pilot/e2e-L08/`（可复核、可重跑）：
 
 | 环节 | 产物 | 实测结果 |
 |---|---|---|
@@ -427,3 +427,52 @@ OK 1 | WARN 2 | FAIL 3 | SKIP 0
 1. 超星 adapter 是否要支持「一个课程多学期」的节次去重？（有机化学当前是 19 章 79 节单学期）
 2. 题库 JSON 是否需要扩展 `schemaVersion: 2`（如加入「易错点标签」与「间隔复习优先级」）？当前先严格对齐 v1，不擅自加字段——规范明确「额外未知字段不执行且不保留」。
 3. 章级 HTML 与课次 HTML 两种范式是否需要统一成一套模板？当前先保留两套，由画像选择。
+
+## 14. 架构变更：拆成两个 skill（2026-10-19）
+
+### 14.1 为什么拆
+
+L0–L2（采集 + 笔记）的证据在**平台和知识库**里；L3–L5（讲解 + 考题 + 质量门）的证据在**契约文件**上。
+混在一个 skill 里，改采集脚本就要连带验证讲解的测试基线，而两边的失败模式完全不同。
+
+注意这**不是**当初定的拆分判据。原判据是「采集要覆盖第二所学校，或出现第三个平台」——
+这次触发拆分的理由是**职责边界**：笔记层已经是这个 skill 里最大、也最独立的一块。
+
+### 14.2 现在的边界
+
+| | `better-awesome-sjtu-canvas-ppt` | `lecture-to-obsidian` |
+|---|---|---|
+| 层 | L0 采集 / L1 素材 / L2 笔记 | L3 讲解 / L4 考题 / L5 质量门 |
+| 产物 | manifest、vault-profile、L##/P##/V##/Concept | 讲解 md + HTML、题库 JSON / 围栏 / md |
+| 契约 | manifest 与 vault-profile 两份 schema | quiz-bank 一份 schema |
+| 文档 | 笔记规范、采集契约 | 讲解、考题、质量门 |
+
+**层间只认两份契约**：`lecture-to-obsidian` 不解析平台响应，也不重算时间码与页码。
+
+### 14.3 迁移清单（已执行）
+
+搬到 better：`adapters/{_common,canvas,chaoxing,pdf}.py`、
+`scripts/{build_manifest,build_vault_profile,gen_notes,check_manifest,check_note_frontmatter,check_vault_profile}.py`、
+`schemas/{manifest,vault-profile}.schema.json`、全部笔记模板、
+原来的两份长文档：采集契约（移到 better，改名为 ACQUISITION）、
+笔记规范（与 better 已有的笔记整理说明**合并成一份**）、
+整个试点目录一起搬（含基准 fixture 与端到端产物），现位于 `better-awesome-sjtu-canvas-ppt/docs/pilot/`。
+
+留在本 skill：`build_explainer_html.py`、`gen_quiz_bank.py`、`check_html_assets.py`、
+`check_quiz_rules.py`、`check_all.py`、`check_builder_alignment.py`、`check_doc_paths.py`、
+`quiz-bank.schema.json`、`templates/explainer.html`。
+
+`check_all.py` 里 4 处原先按 `HERE` 拼的路径改为模块级 `NOTES_SKILL`（由 `--canvas-ppt-skill`
+赋值，默认指向 better）。**拆分后重跑端到端验收，六行结果与拆分前逐字一致**——
+这是「拆分没有改变行为」的主要证据。
+
+### 14.4 这次暴露的两个缺口
+
+1. **`check_all.py` 没有 `quiz` 行。** 总门从不检查本 skill 最主要的产物之一。
+   在补上之前，文档必须写明「题库规则要单独跑」，**不许让「6 行全绿」暗示题库合规**。
+   补法：给 `check_all.py` 加 `--quiz <bank.json>` 与第 7 行（严重度照 `check_quiz_rules.py` 的四级）。
+2. **`check_doc_paths.py` 的 `docs_of()` 只看 `SKILL.md` / `README.md` / `references/*.md` /
+   `docs/PLAN.md`，不扫 `docs/*.md`。** better 的主文档正是 `docs/*.md`，所以它的文档审计
+   目前是空转的。补法：把 `docs/*.md` 纳入，并支持 `--skill-root` 以便审计另一个 skill。
+
+两条都记在这里，而不是悄悄绕过——**没查的东西，不能因为文档写得漂亮就当成查过了。**

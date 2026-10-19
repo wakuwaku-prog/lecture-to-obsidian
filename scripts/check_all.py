@@ -43,6 +43,9 @@ sys.stdout.reconfigure(encoding="utf-8")
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_CANVAS_PPT = os.path.expanduser(
     "~/.dsh/skills/better-awesome-sjtu-canvas-ppt")
+# 笔记层（画像 / manifest / gen_notes / 笔记校验器）已迁到 better skill；
+# 本 skill 只留讲解 + 考题 + 总门。下面的路径由 main() 依据 --notes-skill 赋值。
+NOTES_SKILL = DEFAULT_CANVAS_PPT
 
 STATUS_OK = "OK"
 STATUS_WARN = "WARN"
@@ -277,8 +280,8 @@ def check_manifest(vault, work, manifest_path, rep_rows, quiet):
         rep_rows.append(Row("manifest", STATUS_FAIL, {"errors": 1},
                             "指定的 manifest 不存在：%s" % path, ""))
         return
-    schema = os.path.join(HERE, "..", "schemas", "manifest.schema.json")
-    cmd = [sys.executable, os.path.join(HERE, "check_manifest.py"), path]
+    schema = os.path.join(NOTES_SKILL, "schemas", "manifest.schema.json")
+    cmd = [sys.executable, os.path.join(NOTES_SKILL, "scripts", "check_manifest.py"), path]
     if os.path.isfile(schema):
         cmd += ["--schema", schema]
     rc, out, err = run_proc(cmd)
@@ -322,7 +325,7 @@ def check_profile(vault, profile_path, rep_rows, quiet):
         rep_rows.append(Row("vault-profile", STATUS_WARN, {"warns": 1},
                             "画像还没生成（build_vault_profile.py 未跑）", ""))
         return
-    cmd = [sys.executable, os.path.join(HERE, "check_vault_profile.py"),
+    cmd = [sys.executable, os.path.join(NOTES_SKILL, "scripts", "check_vault_profile.py"),
            path, "--vault", vault]
     rc, out, err = run_proc(cmd)
     status, counts = parse_own_report(out, err, rc)
@@ -396,7 +399,7 @@ def own_frontmatter_verdicts(profile_path, vault):
     """
     if not profile_path or not os.path.isfile(profile_path):
         return None
-    script = os.path.join(HERE, "check_note_frontmatter.py")
+    script = os.path.join(NOTES_SKILL, "scripts", "check_note_frontmatter.py")
     if not os.path.isfile(script):
         return None
     cmd = [sys.executable, script, "--profile", profile_path,
@@ -603,7 +606,7 @@ def check_frontmatter(vault, profile_path, rep_rows, quiet):
         rep_rows.append(Row("note-frontmatter", STATUS_SKIP, {},
                             "没有画像文件，跳过画像驱动的必填字段检查", ""))
         return
-    script = os.path.join(HERE, "check_note_frontmatter.py")
+    script = os.path.join(NOTES_SKILL, "scripts", "check_note_frontmatter.py")
     if not os.path.isfile(script):
         rep_rows.append(Row("note-frontmatter", STATUS_SKIP, {},
                             "check_note_frontmatter.py 不存在：%s" % script, ""))
@@ -688,7 +691,7 @@ def main(argv=None):
                     default=None,
                     help="assets 声明清单文件；与构建器 --assets-list 同义")
     ap.add_argument("--canvas-ppt-skill", default=DEFAULT_CANVAS_PPT,
-                    help="better-awesome-sjtu-canvas-ppt 的 skill 目录")
+                    help="better-awesome-sjtu-canvas-ppt 的 skill 目录（提供采集 adapter、画像、manifest、gen_notes 与笔记校验器）")
     ap.add_argument("--min-recall", type=int, default=3,
                     help="传给 check_note_structure.py 的 --min-recall")
     ap.add_argument("--skip", default="",
@@ -697,6 +700,9 @@ def main(argv=None):
     ap.add_argument("--quiet", action="store_true", help="只打印汇总表")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
+
+    global NOTES_SKILL
+    NOTES_SKILL = args.canvas_ppt_skill
 
     skip = set(s.strip() for s in args.skip.split(",") if s.strip())
     vault = args.vault
