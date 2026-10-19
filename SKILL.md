@@ -84,7 +84,7 @@ python "$SKILL/scripts/build_vault_profile.py" "<vault root>" -o "<vault root>/_
 
 - **Canvas 采集调用它，不复制它的脚本。** 它的 **11 个脚本**（`download_ppt` / `extract_ppt_scenes` / `extract_ppt_frames` / `ocr_slides` / `read_slide_pageno` / `dedupe_slides` / `transcribe_class` / `diarize_transcript` / `scene_times` + 两个校验器）是既有资产；本 skill 的 `adapters/canvas.py` 只做编排与契约转换。
 - **超星采集在本 skill 内**（`adapters/chaoxing.py`），因为它的链路与 Canvas 完全不同：没有平台 PPT 轨、没有可用字幕、且有任务点风险。
-- 它 README 里承诺过但本机不存在的 `docs/OBSIDIAN-NOTES.md` 与 `templates/`，由本 skill 的 `references/` 与 `templates/` 补上。
+- 它的 `docs/OBSIDIAN-NOTES.md`（182 行「从素材到笔记」完整流程）、`docs/WORKFLOW.md` 与 3 个笔记模板，**上游仓库里是有的，但本机这份安装没装全**（2026-10-19 去 GitHub 核实）。本 skill 的 `references/` 与 `templates/` 已覆盖同等内容；**整理笔记前值得把上游那份拉下来对照**，它在文件命名（`PPT p## — Topic (第N节 MMSS).jpg`）与「三件套」写法上写得更细。
 
 **何时该把 `adapters/` 拆成独立 skill**：当采集需要覆盖第二所学校，或出现第三个平台时。在那之前，一个 skill 更好——五层共享同一份契约，拆开必然出现「上游改了字段、下游静默错」。
 

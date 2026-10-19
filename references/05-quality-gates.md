@@ -40,8 +40,8 @@ python "$SKILL/scripts/check_all.py" --vault "<vault root>" --work "<work dir>"
 
 > **一处更正（2026-10-19）**：这条纪律原先还举了 `better-awesome-sjtu-canvas-ppt` 的
 > `docs/OBSIDIAN-NOTES.md` 与 `templates/` 当例子，说它「文档承诺了没交付的东西」。
-> **那个判断是错的。** 去 GitHub 核过：**上游仓库有**这两者——`docs/OBSIDIAN-NOTES.md`
-> （182 行「从素材到笔记」流程）、`docs/WORKFLOW.md`、3 个 `templates/*.md`。
+> **那个判断是错的。** 去 GitHub 核过：**上游仓库有** `docs/OBSIDIAN-NOTES.md`（182 行「从素材到笔记」流程）。
+> **上游仓库也有** `docs/WORKFLOW.md` 与 3 个 `templates/*.md`。
 > **是本地这份安装不完整**，只装了 `SKILL.md` + `scripts/`（11 个脚本与远端逐字节相同）。
 > 教训：**判断「别人没交付」之前先去远端核实**——把「本机缺」说成「上游缺」是另一种失实。
 

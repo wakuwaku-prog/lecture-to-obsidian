@@ -48,6 +48,18 @@ NEGATIVE_MARKERS = (
     "不是本 skill 的文件",
     "目标库里的路径",
     "会被抽成",
+    # 提到**别的项目**的那一行，其路径属于那个项目，不是本 skill 的承诺。
+    # 实测触发：更正「上游有没有 docs/OBSIDIAN-NOTES.md」时，本 skill 的文档里
+    # 出现了上游的路径，被本工具误报成自己缺文件。
+    "远端仓库",
+    "上游仓库",
+    "本机安装不完整",
+    "本机没装全",
+)
+
+# 提到这些**别的项目 / skill 名**的行，其路径一律视为外部引用
+EXT_PROJECTS = (
+    "better-awesome-sjtu-canvas-ppt",
 )
 
 # 故意用作反面例子的**精确文件名**。必须精确匹配，不能用子串——
@@ -89,7 +101,8 @@ def mentions(text: str):
       - 文件名精确等于 DELIBERATE_BASENAMES 里的反面例子。
     """
     for line in text.splitlines():
-        neg = any(mark in line for mark in NEGATIVE_MARKERS)
+        neg = (any(mark in line for mark in NEGATIVE_MARKERS)
+               or any(p in line for p in EXT_PROJECTS))
         for m in PATH_RE.finditer(line):
             raw = PREFIX_RE.sub("", m.group(1)).rstrip(TAIL_CHARS)
             is_example = PurePath(raw).name in DELIBERATE_BASENAMES
