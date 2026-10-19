@@ -16,6 +16,9 @@
 
 已知边界（不要把本脚本当成万能）：
   - 正则匹配的是**路径形态的引用**；纯文字提到的文件名（不带目录）不在此列。
+  - **限定词必须在路径之前 60 字符内**（位置敏感）。跨行的限定词不会被识别——
+    引用别的项目的路径时，请把「上游」/ 项目名写在路径**紧前面**，不要靠上一行的
+    标题来限定。这是刻意的取舍：窗口放宽会把同一行里本 skill 自己的路径一起误伤（已实测）。
   - 反向检查（交付物里哪些文件没被文档提到）只作提示，不判失败——例如 SKILL.md
     自身、以及只在代码里 import 的共用模块。
 """
@@ -57,9 +60,18 @@ NEGATIVE_MARKERS = (
     "本机没装全",
 )
 
-# 提到这些**别的项目 / skill 名**的行，其路径一律视为外部引用
+# 提到这些**别的项目 / skill 名**的路径限定词时，其后的路径视为外部引用。
+# 判定只看路径**之前** 60 字符（位置敏感），所以「上游 `docs/x.md`」会被跳过，
+# 而同一行里本 skill 自己的路径不会被误伤。
 EXT_PROJECTS = (
     "better-awesome-sjtu-canvas-ppt",
+)
+
+EXTERNAL_QUALIFIERS = (
+    "上游",
+    "远端",
+    "别的项目",
+    "其它项目",
 )
 
 # 故意用作反面例子的**精确文件名**。必须精确匹配，不能用子串——
@@ -101,12 +113,20 @@ def mentions(text: str):
       - 文件名精确等于 DELIBERATE_BASENAMES 里的反面例子。
     """
     for line in text.splitlines():
-        neg = (any(mark in line for mark in NEGATIVE_MARKERS)
-               or any(p in line for p in EXT_PROJECTS))
+        neg = any(mark in line for mark in NEGATIVE_MARKERS)
+        prev_end = 0
         for m in PATH_RE.finditer(line):
             raw = PREFIX_RE.sub("", m.group(1)).rstrip(TAIL_CHARS)
+            # **限定词只绑定到它后面最近的一个路径。**
+            # 只看「上一个路径结束」到「本路径开始」之间的文字。
+            # 这样「上游 `docs/x.md` 与本 skill 的 `scripts/y.py`」里 y 不会被 x 的
+            # 限定词误伤——早先按「路径前 60 字符」判断时就会漏掉 y（实测过）。
+            gap = line[prev_end:m.start()]
+            external = (any(p in gap for p in EXT_PROJECTS)
+                        or any(q in gap for q in EXTERNAL_QUALIFIERS))
+            prev_end = m.end()
             is_example = PurePath(raw).name in DELIBERATE_BASENAMES
-            yield raw, neg or is_example
+            yield raw, neg or external or is_example
 
 
 def main() -> int:
