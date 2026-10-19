@@ -34,14 +34,16 @@ python "$SKILL/scripts/check_all.py" --vault "<vault root>" --work "<work dir>"
 > **文档里提到的每个脚本 / 模板 / 引用路径，都必须在交付物里真实存在。**
 > 引用前先 `test -f`；写完后用一次全量清单核对「文档提到的路径 ⊂ 实际文件」。
 
-**为什么单列一条**：本 skill 的存在理由之一，就是
-`better-awesome-sjtu-canvas-ppt` 的 README 指向了**不存在**、**未交付**的
-`docs/OBSIDIAN-NOTES.md` 与 `templates/` —— 文档承诺了没交付的东西。
+**为什么单列一条**：本 skill 自己就犯过一次——`references/05-quality-gates.md` 引用了
+`check_builder_alignment.py`，但该文件当时只存在于临时目录、**未落地**。接手者会以为
+「构建器/校验器常量漂移」这道防护已经生效，于是不再手工核对，**结果比没有防护更差**。
 
-这类失配比普通笔误**更坏**：接手者会以为某道防护已经生效，于是不再手工核对，
-**结果比没有防护更差**。本 skill 自己也犯过一次（文档引用了
-`check_builder_alignment.py`，但该文件当时只存在于临时目录、**未落地**），
-所以这条纪律是踩过之后写下来的。
+> **一处更正（2026-10-19）**：这条纪律原先还举了 `better-awesome-sjtu-canvas-ppt` 的
+> `docs/OBSIDIAN-NOTES.md` 与 `templates/` 当例子，说它「文档承诺了没交付的东西」。
+> **那个判断是错的。** 去 GitHub 核过：**上游仓库有**这两者——`docs/OBSIDIAN-NOTES.md`
+> （182 行「从素材到笔记」流程）、`docs/WORKFLOW.md`、3 个 `templates/*.md`。
+> **是本地这份安装不完整**，只装了 `SKILL.md` + `scripts/`（11 个脚本与远端逐字节相同）。
+> 教训：**判断「别人没交付」之前先去远端核实**——把「本机缺」说成「上游缺」是另一种失实。
 
 **自检命令**（本 skill 自己的工具，覆盖全部文档）：
 

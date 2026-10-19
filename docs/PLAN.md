@@ -41,7 +41,7 @@
 
 | 来源 | 已经有的 | 缺口（本 skill 要补） |
 |---|---|---|
-| `better-awesome-sjtu-canvas-ppt`（SKILL.md + 12 脚本） | Canvas 双路径采集；Whisper 分段转写；WavLM 说话人；`check_vault_links.py` / `check_note_structure.py` | README 指向的 `docs/OBSIDIAN-NOTES.md` 与 `templates/` **本机不存在**（实测目录只有 `SKILL.md` + `scripts/`）；无超星；无讲解/考题 |
+| `better-awesome-sjtu-canvas-ppt`（**11 个脚本**） | Canvas 双路径采集；Whisper 分段转写；WavLM 说话人；`check_vault_links.py` / `check_note_structure.py`；**另有 `docs/OBSIDIAN-NOTES.md`（182 行「从素材到笔记」完整流程）+ `docs/WORKFLOW.md` + 3 个笔记模板** | 本地安装**不完整**：只装了 `SKILL.md` + `scripts/`（11 个脚本与远端逐字节相同），`docs/` 与 `templates/` 未装；无超星；无讲解/考题 |
 | 有机化学 `AGENTS.md` | 超星链路（courseid/clazzid → knowledgeid → cards → ananas/status → 直链 + Referer）；只读安全边界；76 视频 / 21 PDF 实战规模 | 平台无字幕 → 必须本地 Whisper；无 PPT 轨 |
 | 有机化学 `讲解格式.md` + `_scripts/NOTE_SPEC.md` | 讲解三分工；五类证据标记；matplotlib 字形与 `$` 落单坑；配图优先级 PPT帧 > RDKit > 自绘；章级 HTML 范式 | 551 行且高度化学专属（RDKit、结构式、纽曼投影），必须抽象掉学科内容 |
 | 心理与精神健康 `AGENTS.md` + `_scripts/讲解HTML/SPEC — 课次智能体作业规范.md` | 对话讲解输出规则；随堂测验出题规则；单文件 HTML 精确规范（base64 内嵌 / 吸附目录 / 灯箱 / 暗色 / 打印 / 原生判分） | 单课 2–3 MB，体积需管 |
@@ -308,7 +308,7 @@ L5 质量门         check_all.py（链接/结构/出题/HTML资产/manifest/Git
 | 结论 | 证据位置 |
 |---|---|
 | Canvas 双路径与 11 个脚本 | `~/.dsh/skills/better-awesome-sjtu-canvas-ppt/SKILL.md`、`scripts/` |
-| 该 skill 缺 `docs/` 与 `templates/` | 实测 `ls` 仅 `SKILL.md` + `scripts`（README 第 60–64 行承诺了它们） |
+| **本机安装不完整**：缺 `docs/` 与 `templates/` | 实测本机 `ls` 仅 `SKILL.md` + `scripts`；但**远端仓库有** `docs/OBSIDIAN-NOTES.md`（182 行）、`docs/WORKFLOW.md` 与 3 个模板——**不是上游没写，是本机没装全**（2026-10-19 去 GitHub 核实） |
 | 超星链路与安全边界 | `C:\这是一个文件夹\大三\有机化学\AGENTS.md` §阶段 0、§阶段 1 |
 | 超星无平台字幕 | 同上：「`richvideo/allsubtitle` 抽样返回 `[]`」 |
 | 讲解三分工与五类标记 | `C:\这是一个文件夹\大三\有机化学\讲解格式.md` §0、§2.3 |
