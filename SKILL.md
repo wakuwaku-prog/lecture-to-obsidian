@@ -82,7 +82,7 @@ python "$SKILL/scripts/build_vault_profile.py" "<vault root>" -o "<vault root>/_
 
 ## 4. 与 `better-awesome-sjtu-canvas-ppt` 的关系
 
-- **Canvas 采集调用它，不复制它的脚本。** 它的 12 个脚本（场景抽取、逐页 OCR、页脚页码、去重、分段转写、说话人分离、两个校验器）是既有资产；本 skill 的 `adapters/canvas.py` 只做编排与契约转换。
+- **Canvas 采集调用它，不复制它的脚本。** 它的 **11 个脚本**（`download_ppt` / `extract_ppt_scenes` / `extract_ppt_frames` / `ocr_slides` / `read_slide_pageno` / `dedupe_slides` / `transcribe_class` / `diarize_transcript` / `scene_times` + 两个校验器）是既有资产；本 skill 的 `adapters/canvas.py` 只做编排与契约转换。
 - **超星采集在本 skill 内**（`adapters/chaoxing.py`），因为它的链路与 Canvas 完全不同：没有平台 PPT 轨、没有可用字幕、且有任务点风险。
 - 它 README 里承诺过但本机不存在的 `docs/OBSIDIAN-NOTES.md` 与 `templates/`，由本 skill 的 `references/` 与 `templates/` 补上。
 

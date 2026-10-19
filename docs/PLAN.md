@@ -13,7 +13,7 @@
 |---|---|
 | 一个 skill 还是拆开？ | **一个**。五层共享同一份 `manifest.json` 与同一份知识库画像，拆开必然出现「上游改字段、下游静默错」。用 `SKILL.md`（路由 + 铁律 + 契约）+ `references/`（按层按需加载）拿到渐进披露的全部好处。 |
 | 拆分判据 | 采集需覆盖**第二所学校**，或出现**第三个平台**时，把 `adapters/` 整体抽成 `sjtu-capture`。 |
-| 与现有 skill 的关系 | Canvas 采集**调用** `better-awesome-sjtu-canvas-ppt`，不复制其 12 个脚本；超星采集内置于本 skill。 |
+| 与现有 skill 的关系 | Canvas 采集**调用** `better-awesome-sjtu-canvas-ppt`，不复制其 11 个脚本；超星采集内置于本 skill。 |
 | 讲解的默认形态 | **Obsidian md 是唯一真源**，单文件 HTML 按需派生。 |
 | 考题的默认形态 | 三份同源：对话 `dsh-ui` 卷子 / md 折叠答案 / 题库 JSON v1（可直接拖进既有刷题工具）。 |
 
@@ -307,7 +307,7 @@ L5 质量门         check_all.py（链接/结构/出题/HTML资产/manifest/Git
 
 | 结论 | 证据位置 |
 |---|---|
-| Canvas 双路径与 12 个脚本 | `~/.dsh/skills/better-awesome-sjtu-canvas-ppt/SKILL.md`、`scripts/` |
+| Canvas 双路径与 11 个脚本 | `~/.dsh/skills/better-awesome-sjtu-canvas-ppt/SKILL.md`、`scripts/` |
 | 该 skill 缺 `docs/` 与 `templates/` | 实测 `ls` 仅 `SKILL.md` + `scripts`（README 第 60–64 行承诺了它们） |
 | 超星链路与安全边界 | `C:\这是一个文件夹\大三\有机化学\AGENTS.md` §阶段 0、§阶段 1 |
 | 超星无平台字幕 | 同上：「`richvideo/allsubtitle` 抽样返回 `[]`」 |
