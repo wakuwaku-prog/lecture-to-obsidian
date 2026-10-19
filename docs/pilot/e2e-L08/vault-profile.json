@@ -1,0 +1,529 @@
+{
+  "schemaVersion": 1,
+  "vault": {
+    "root": "C:\\Users\\epiph\\Documents\\Obsidian\\心理与精神健康",
+    "name": "心理与精神健康",
+    "courseCode": "HLT3202G",
+    "courseName": "心理与精神健康",
+    "agentsMd": "AGENTS.md",
+    "shared": false,
+    "generatedAt": "2026-10-19T21:58:45+08:00",
+    "reviewedByHuman": false
+  },
+  "dirs": {
+    "lecture": "02 课堂笔记",
+    "deck": "01 课程资料",
+    "timeline": null,
+    "concept": "03 核心概念",
+    "method": null,
+    "disorder": "04 精神障碍",
+    "assessment": "08 课程考核",
+    "explainer": "10 讲解 HTML",
+    "quizBank": null,
+    "attachments": "09 参考资料/附件",
+    "templates": "99 模板",
+    "scratch": "_scripts",
+    "sourceRegister": "09 参考资料/Source Register.md",
+    "excluded": []
+  },
+  "naming": {
+    "lecture": "L## — 中文主题 English Topic",
+    "deck": "P## — 中文主题 English Topic",
+    "timeline": "V##",
+    "concept": "Concept — English Term",
+    "forbiddenChars": [
+      "[",
+      "]"
+    ]
+  },
+  "frontmatter": {
+    "required": [
+      "course_code",
+      "tags",
+      "type"
+    ],
+    "requiredIsInferred": true,
+    "requiredPerNoteType": {
+      "assessment-details": [],
+      "assessment-prep": [],
+      "concept": [
+        "course_code",
+        "source",
+        "status",
+        "tags",
+        "term",
+        "type"
+      ],
+      "concept-note": [
+        "concept",
+        "course_code",
+        "date",
+        "source",
+        "status",
+        "tags",
+        "title",
+        "type"
+      ],
+      "course-overview": [],
+      "dashboard": [],
+      "exam-review": [],
+      "framework": [],
+      "glossary": [],
+      "guide": [],
+      "hub": [],
+      "index": [
+        "course_code",
+        "tags",
+        "type"
+      ],
+      "lecture-note": [
+        "course_code",
+        "status",
+        "tags",
+        "type"
+      ],
+      "ppt-analysis": [],
+      "ppt-note": [],
+      "ppt-overview": [
+        "course_code",
+        "lecture",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "project-note": [],
+      "project-workspace": [],
+      "provenance": [],
+      "reading-note": [],
+      "roadmap": [],
+      "schedule": [],
+      "slide-deck-analysis": [],
+      "source-register": [],
+      "syllabus": [],
+      "video-analysis": [],
+      "workflow": []
+    },
+    "optional": [
+      "academic_year",
+      "assessment",
+      "authors",
+      "concept",
+      "course_title",
+      "date",
+      "deck",
+      "deck_file",
+      "deck_id",
+      "doi_or_url",
+      "duration",
+      "language",
+      "lecture",
+      "lecture_date",
+      "lecture_id",
+      "material_date",
+      "module",
+      "ppt_id",
+      "processed_date",
+      "project_area",
+      "recorded_date",
+      "replay_checked",
+      "semester",
+      "source",
+      "source_file",
+      "source_location",
+      "source_status",
+      "status",
+      "term",
+      "term_zh",
+      "title",
+      "topic",
+      "video_id",
+      "year"
+    ],
+    "perNoteType": {
+      "assessment-details": [
+        "course_code",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "assessment-prep": [
+        "assessment",
+        "course_code",
+        "date",
+        "lecture",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "concept": [
+        "source_location",
+        "term_zh"
+      ],
+      "concept-note": [],
+      "course-overview": [
+        "academic_year",
+        "course_code",
+        "course_title",
+        "language",
+        "semester",
+        "source_status",
+        "tags",
+        "type"
+      ],
+      "dashboard": [
+        "academic_year",
+        "course_code",
+        "course_title",
+        "language",
+        "semester",
+        "tags",
+        "type"
+      ],
+      "exam-review": [
+        "course_code",
+        "status",
+        "tags",
+        "topic",
+        "type"
+      ],
+      "framework": [
+        "course_code",
+        "source",
+        "tags",
+        "type"
+      ],
+      "glossary": [
+        "course_code",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "guide": [
+        "course_code",
+        "tags",
+        "type"
+      ],
+      "hub": [
+        "course_code",
+        "tags",
+        "type"
+      ],
+      "index": [
+        "status"
+      ],
+      "lecture-note": [
+        "date",
+        "deck",
+        "lecture",
+        "lecture_date",
+        "lecture_id",
+        "material_date",
+        "module",
+        "replay_checked",
+        "source",
+        "source_file",
+        "source_location",
+        "title"
+      ],
+      "ppt-analysis": [
+        "course_code",
+        "lecture_id",
+        "source_file",
+        "source_location",
+        "status",
+        "tags",
+        "title",
+        "type"
+      ],
+      "ppt-note": [
+        "course_code",
+        "deck_file",
+        "lecture_date",
+        "lecture_id",
+        "ppt_id",
+        "source",
+        "status",
+        "tags",
+        "title",
+        "type"
+      ],
+      "ppt-overview": [
+        "date",
+        "material_date"
+      ],
+      "project-note": [
+        "course_code",
+        "project_area",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "project-workspace": [
+        "course_code",
+        "status",
+        "tags",
+        "type"
+      ],
+      "provenance": [
+        "course_code",
+        "date",
+        "lecture",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "reading-note": [
+        "authors",
+        "course_code",
+        "doi_or_url",
+        "status",
+        "tags",
+        "title",
+        "type",
+        "year"
+      ],
+      "roadmap": [
+        "course_code",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "schedule": [
+        "academic_year",
+        "course_code",
+        "semester",
+        "source",
+        "status",
+        "tags",
+        "type"
+      ],
+      "slide-deck-analysis": [
+        "course_code",
+        "deck_id",
+        "lecture_date",
+        "source_file",
+        "status",
+        "tags",
+        "title",
+        "type"
+      ],
+      "source-register": [
+        "course_code",
+        "tags",
+        "type"
+      ],
+      "syllabus": [
+        "academic_year",
+        "course_code",
+        "course_title",
+        "language",
+        "semester",
+        "source_status",
+        "tags",
+        "type"
+      ],
+      "video-analysis": [
+        "course_code",
+        "duration",
+        "processed_date",
+        "recorded_date",
+        "source",
+        "status",
+        "tags",
+        "title",
+        "type",
+        "video_id"
+      ],
+      "workflow": [
+        "course_code",
+        "tags",
+        "type"
+      ]
+    },
+    "statusEnum": null
+  },
+  "structure": {
+    "summarySectionAliases": [
+      "4 一张总结图（怎么问）",
+      "一句话总结",
+      "本课总结",
+      "本课要点",
+      "视觉系统要点 Vision",
+      "我的中文总结 My synthesis",
+      "中文总结与英文关键词",
+      "7️⃣ 一句话总结 4A",
+      "逐个指标：课件原文 + 中文 + 要点",
+      "中文总结",
+      "本节要点",
+      "Chinese synthesis"
+    ],
+    "summaryDetection": "heading-alias",
+    "recallQuestions": {
+      "L": 0,
+      "assessment-details": 0,
+      "assessment-prep": 0,
+      "concept": 3,
+      "concept-note": 0,
+      "course-overview": 0,
+      "dashboard": 0,
+      "exam-review": 1,
+      "framework": 0,
+      "glossary": 0,
+      "guide": 0,
+      "hub": 0,
+      "index": 0,
+      "lecture-note": 3,
+      "ppt-analysis": 0,
+      "ppt-note": 0,
+      "ppt-overview": 0,
+      "project-note": 0,
+      "project-workspace": 0,
+      "provenance": 0,
+      "reading-note": 0,
+      "roadmap": 0,
+      "schedule": 0,
+      "slide-deck-analysis": 4,
+      "source-register": 0,
+      "syllabus": 0,
+      "video-analysis": 4,
+      "workflow": 0
+    },
+    "requireToVerifyList": {
+      "L": false,
+      "assessment-details": true,
+      "assessment-prep": false,
+      "concept": false,
+      "concept-note": false,
+      "course-overview": false,
+      "dashboard": false,
+      "exam-review": false,
+      "framework": false,
+      "glossary": false,
+      "guide": false,
+      "hub": false,
+      "index": false,
+      "lecture-note": false,
+      "ppt-analysis": false,
+      "ppt-note": true,
+      "ppt-overview": false,
+      "project-note": false,
+      "project-workspace": false,
+      "provenance": false,
+      "reading-note": false,
+      "roadmap": false,
+      "schedule": false,
+      "slide-deck-analysis": false,
+      "source-register": false,
+      "syllabus": false,
+      "video-analysis": true,
+      "workflow": false
+    },
+    "requireUncheckedToVerifyItem": {
+      "L": false,
+      "assessment-details": true,
+      "assessment-prep": false,
+      "concept": false,
+      "concept-note": false,
+      "course-overview": false,
+      "dashboard": false,
+      "exam-review": false,
+      "framework": false,
+      "glossary": false,
+      "guide": false,
+      "hub": false,
+      "index": false,
+      "lecture-note": false,
+      "ppt-analysis": false,
+      "ppt-note": true,
+      "ppt-overview": false,
+      "project-note": false,
+      "project-workspace": false,
+      "provenance": false,
+      "reading-note": false,
+      "roadmap": false,
+      "schedule": false,
+      "slide-deck-analysis": false,
+      "source-register": false,
+      "syllabus": false,
+      "video-analysis": false,
+      "workflow": false
+    },
+    "demoteReusedFindings": [
+      "summary",
+      "recall",
+      "to-verify",
+      "frontmatter"
+    ]
+  },
+  "mediaPolicy": {
+    "archiveVideo": false,
+    "archiveAudio": false,
+    "archiveTranscript": true,
+    "archiveSlideImages": true,
+    "registerDeletedMedia": true,
+    "note": "- 课堂视频、AAC/WAV 等原始媒体只作临时处理输入。处理完成并完成必要核对后清理；Source Register 保留来源、日期、节次、原始文件名和“原始媒体未归档”状态，但不建立指向不存在媒体的链接。"
+  },
+  "images": {
+    "embedSyntax": "![[{path}|{width}]]",
+    "lectureWidth": 540,
+    "deckWidth": 760,
+    "timelineWidth": null,
+    "escapePipeInTables": true,
+    "preferEmbeddedPageImage": true
+  },
+  "callouts": {
+    "slideBlock": "[!example]+",
+    "mustRemember": "[!important]",
+    "toVerify": "[!note]",
+    "myInterpretation": "[!tip]",
+    "quizAnswer": null,
+    "abstract": "[!abstract]"
+  },
+  "evidenceTags": [
+    "PPT原文",
+    "课堂口述",
+    "机器转写",
+    "辅助解释",
+    "我的推断",
+    "待核实"
+  ],
+  "explainer": {
+    "enabled": true,
+    "mode": "single-file-html",
+    "outDir": "10 讲解 HTML",
+    "imageMaxEdgePx": null,
+    "maxBytes": null,
+    "imageWidthAttr": "max-width:min(720px,100%)",
+    "dshUiFencesPerTurn": 6
+  },
+  "quiz": {
+    "bankEnabled": false,
+    "bankSchemaVersion": 1,
+    "outDir": null,
+    "questionsPerSet": null,
+    "correctOptionMustNotBeLongest": true,
+    "shuffleAnswerPositions": true,
+    "explanationsCiteSource": true
+  },
+  "git": {
+    "shared": false,
+    "requireStatusBeforeEdit": true,
+    "requireFetchBeforeEdit": true,
+    "pullOnlyWhenClean": true,
+    "stageOnlyTargetFiles": true,
+    "forbidden": [
+      "git reset --hard",
+      "git checkout -- .",
+      "git clean",
+      "git push --force",
+      "git push --force-with-lease"
+    ]
+  }
+}

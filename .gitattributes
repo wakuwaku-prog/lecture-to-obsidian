@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# 二进制/大文件不参与行尾转换
+*.png binary
+*.jpg binary
+*.pdf binary
+*.html -text

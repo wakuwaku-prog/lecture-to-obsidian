@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+Thumbs.db
+# 采集临时产物（含签名直链，绝不入库）
+_tmp_urls/
+*.tmp

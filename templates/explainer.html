@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<!--
+  讲解单文件 HTML 模板（lecture-to-obsidian / L3 讲解层）。
+  占位符（双花括号包裹的大写单词）：TITLE / SUBTITLE / META / CHIPS / CONTENT / BUILT，
+  由 scripts/build_explainer_html.py 替换；脚本只做占位替换，不改 CSS/JS。
+  ⚠️ 本文件里**不要写出占位符的字面量**（注释里也不行）：脚本是纯字符串替换，
+     写进注释会被一起替换，导致正文被注入两次（自测时已踩过一次）。
+  契约来源：docs/PLAN.md §6.2（单文件，冻结，逐字继承自 心理库 10 讲解 HTML/L06）
+            docs/PLAN.md §6.3（章级，附加块；附加块不改动 §6.2 的类名与语义）
+  分区标记： [FROZEN §6.2] = 逐字继承，改它等于改契约； [CHAPTER §6.3] = 章级附加，可扩展。
+  硬约束：每张 <img> 必须带 style="max-width:min(Npx,100%)"，不得写死 px（窄屏会顶破卡片）。
+-->
+<style>
+/* ===================== [FROZEN §6.2] 主题变量 ===================== */
+:root{
+  --bg:#eef0f6; --card:#ffffff; --card-2:#f8fafc; --ink:#1b2230; --ink-soft:#475569;
+  --soft:#64748b; --line:#e3e7ef; --line-2:#eef1f6;
+  --accent:#4f46e5; --accent-2:#0ea5e9; --accent-soft:#eef2ff;
+  --ok:#15803d; --ok-bg:#e8f7ee; --bad:#b91c1c; --bad-bg:#fdecec;
+  --warn:#b45309; --warn-bg:#fef6e7; --info:#1d4ed8; --info-bg:#eef4ff;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px rgba(16,24,40,.06);
+  --radius:16px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0d0f14; --card:#151922; --card-2:#1b2029; --ink:#e6e9f0; --soft:#98a2b3; --line:#262c38; --line-2:#212734;
+    --accent:#8b87f5; --accent-2:#38bdf8; --accent-soft:#1e2340;
+    --ok:#4ade80; --ok-bg:#12291c; --bad:#f87171; --bad-bg:#2b1416;
+    --warn:#fbbf24; --warn-bg:#2a2110; --info:#93c5fd; --info-bg:#12203a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC","Microsoft YaHei","PingFang SC",sans-serif;
+  font-size:16.5px;line-height:1.8;-webkit-font-smoothing:antialiased}
+
+/* 阅读进度条 + 顶栏 */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .1s linear}
+.topbar{position:sticky;top:0;z-index:50;backdrop-filter:saturate(180%) blur(10px);
+  background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
+.tb-inner{max-width:1280px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
+.tb-title{font-weight:700;font-size:15px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-title span{color:var(--soft);font-weight:500;margin-left:8px}
+.tb-actions{display:flex;gap:8px}
+.tb-actions button{font:inherit;font-size:13.5px;padding:6px 13px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.tb-actions button:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 布局：侧边目录 + 正文 */
+.layout{max-width:1280px;margin:0 auto;padding:24px 20px 90px;
+  display:grid;grid-template-columns:264px minmax(0,1fr);gap:24px;align-items:start}
+aside.toc{position:sticky;top:64px;max-height:calc(100vh - 88px);overflow:auto;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 8px 16px 18px;box-shadow:var(--shadow);font-size:14.5px}
+aside.toc h2{font-size:12px;letter-spacing:.12em;color:var(--soft);margin:0 0 10px;text-transform:uppercase}
+aside.toc ol{margin:0;padding-left:18px}
+aside.toc ol ol{padding-left:16px;margin:2px 0 6px}
+aside.toc li{margin:2px 0}
+aside.toc a{color:var(--ink);text-decoration:none;display:block;padding:2px 6px;border-radius:7px;border-left:2px solid transparent}
+aside.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+aside.toc a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft);font-weight:600}
+@media (max-width:1060px){
+  .layout{grid-template-columns:1fr}
+  aside.toc{position:static;max-height:340px}
+}
+
+main{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:6px 32px 40px;box-shadow:var(--shadow);min-width:0}
+
+/* 封面 */
+.hero{margin:22px 0 8px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.hero h1{font-size:27px;line-height:1.35;margin:0 0 8px;letter-spacing:-.01em}
+.hero .sub{color:var(--soft);font-size:15.5px;margin:0 0 14px}
+.hero .meta{font-size:13px;color:var(--soft);background:var(--card-2);border:1px dashed var(--line);
+  border-radius:10px;padding:9px 13px;margin:0;line-height:1.65}
+
+/* 正文排版 */
+main{counter-reset:h2 fig}
+main h2{counter-increment:h2;counter-reset:h3;font-size:22px;line-height:1.4;
+  margin:40px 0 14px;padding:0 0 10px 0;border-bottom:2px solid var(--line);
+  display:flex;align-items:baseline;gap:11px}
+main h2::before{content:counter(h2);flex:none;display:inline-flex;align-items:center;justify-content:center;
+  min-width:30px;height:30px;padding:0 8px;border-radius:9px;font-size:15px;font-weight:700;color:#fff;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+main h3{counter-increment:h3;font-size:18.5px;margin:26px 0 10px;padding-left:11px;border-left:4px solid var(--accent-soft)}
+main h3::before{content:counter(h2) "." counter(h3) "  ";color:var(--soft);font-weight:600;font-size:15px}
+main h4{font-size:16.5px;margin:18px 0 6px;color:var(--ink)}
+main p{margin:11px 0}
+main ul,main ol{padding-left:24px}
+main li{margin:5px 0}
+main strong{color:var(--ink)}
+main a{color:var(--accent)}
+hr{border:none;border-top:1px dashed var(--line);margin:26px 0}
+blockquote{margin:14px 0;padding:10px 18px;border-left:4px solid var(--accent-soft);
+  background:var(--card-2);color:var(--ink);border-radius:0 10px 10px 0}
+code{background:var(--card-2);border:1px solid var(--line);border-radius:6px;padding:1.5px 6px;font-size:14px;
+  font-family:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace;word-break:break-word}
+pre{overflow-x:auto;max-width:100%;background:var(--card-2);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;font-size:13px;line-height:1.55;
+  font-family:ui-monospace,SFMono-Regular,Consolas,"Courier New",monospace}
+pre code{border:none;background:none;padding:0}
+svg{max-width:100%;height:auto}
+
+/* 表格 */
+.tblwrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:13px;background:var(--card)}
+table.tbl{border-collapse:collapse;width:100%;font-size:14.8px;margin:0}
+table.tbl th,table.tbl td{border-bottom:1px solid var(--line-2);border-right:1px solid var(--line-2);
+  padding:9px 12px;text-align:left;vertical-align:top}
+table.tbl th{background:var(--card-2);font-weight:650;position:sticky;top:0}
+table.tbl tr:last-child td{border-bottom:none}
+table.tbl th:last-child,table.tbl td:last-child{border-right:none}
+table.tbl tbody tr:nth-child(even){background:color-mix(in srgb,var(--card-2) 55%,transparent)}
+table.tbl tbody tr:hover{background:var(--accent-soft)}
+
+/* 图卡：编号 + 点击放大 */
+figure.fig{counter-increment:fig;margin:20px 0;border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;background:var(--card-2);box-shadow:var(--shadow)}
+figure.fig img{display:block;width:100%;height:auto;cursor:zoom-in;background:#fff}
+figure.fig figcaption{padding:9px 14px;font-size:13px;color:var(--soft);border-top:1px solid var(--line);line-height:1.6}
+figure.fig figcaption::before{content:"图 " counter(fig) " · ";color:var(--accent);font-weight:700}
+
+/* 提示框 */
+.callout{position:relative;border-radius:13px;padding:13px 16px 13px 46px;margin:16px 0;
+  border:1px solid var(--line);background:var(--info-bg);border-left:4px solid var(--info)}
+.callout::before{position:absolute;left:15px;top:12px;font-size:17px;line-height:1.4}
+.callout.info::before{content:"ℹ️"}
+.callout.success{background:var(--ok-bg);border-left-color:var(--ok)}
+.callout.success::before{content:"✅"}
+.callout.warning{background:var(--warn-bg);border-left-color:var(--warn)}
+.callout.warning::before{content:"⚠️"}
+.callout.error{background:var(--bad-bg);border-left-color:var(--bad)}
+.callout.error::before{content:"⛔"}
+.callout .ct{font-weight:700;margin:0 0 5px}
+.callout p:last-child{margin-bottom:0}
+
+/* 折叠 */
+details.acc{border:1px solid var(--line);border-radius:12px;padding:0;margin:11px 0;background:var(--card-2);overflow:hidden}
+details.acc summary{cursor:pointer;font-weight:650;padding:11px 15px;list-style:none}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary::before{content:"▸ ";color:var(--accent);font-weight:700}
+details.acc[open] summary::before{content:"▾ "}
+details.acc[open] summary{border-bottom:1px solid var(--line)}
+details.acc > *:not(summary){margin:11px 15px}
+
+/* 步骤 */
+ol.steps{counter-reset:s;list-style:none;padding-left:0;margin:16px 0}
+ol.steps>li{counter-increment:s;position:relative;padding:2px 0 2px 42px;margin:12px 0}
+ol.steps>li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+
+/* 测验 */
+.quiz{border:1px solid var(--line);border-radius:15px;padding:18px 20px;margin:20px 0;
+  background:linear-gradient(180deg,var(--card),var(--card-2));box-shadow:var(--shadow)}
+.quiz .qhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;
+  padding-bottom:10px;border-bottom:1px solid var(--line)}
+.quiz .qhead .qtitle{font-weight:700;font-size:15.5px}
+.quiz .qhead .qprog{font-size:13px;color:var(--soft)}
+.q{margin:0 0 14px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.q:last-of-type{border-bottom:none;padding-bottom:0}
+.q .qtext{font-weight:650;margin:0 0 8px}
+.q label{display:flex;gap:9px;align-items:flex-start;padding:8px 11px;border-radius:10px;margin:5px 0;
+  cursor:pointer;border:1px solid var(--line);background:var(--card);transition:.12s}
+.q label:hover{border-color:var(--accent);background:var(--accent-soft)}
+.q label input{margin-top:5px;accent-color:var(--accent)}
+.q label.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.q label.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.q .expl{display:none;font-size:14px;color:var(--ink);background:var(--card-2);
+  border-left:3px solid var(--accent);padding:9px 13px;border-radius:0 9px 9px 0;margin:9px 0 0}
+.q.revealed .expl{display:block}
+.quiz .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px}
+.quiz button{font:inherit;font-size:14.5px;font-weight:600;padding:9px 20px;border-radius:999px;cursor:pointer;
+  border:1px solid var(--accent);background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff}
+.quiz button.ghost{background:var(--card);color:var(--accent)}
+.quiz .score{font-weight:700;font-size:15px;margin:0;color:var(--accent)}
+
+/* 回到顶部 */
+#toTop{position:fixed;right:22px;bottom:22px;z-index:55;width:42px;height:42px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-size:17px;
+  box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s}
+#toTop.show{opacity:1;pointer-events:auto}
+
+/* 灯箱 */
+#lightbox{position:fixed;inset:0;z-index:70;background:rgba(10,12,18,.88);display:none;
+  align-items:center;justify-content:center;padding:26px;cursor:zoom-out}
+#lightbox.show{display:flex}
+#lightbox img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+
+footer.bot{max-width:1280px;margin:8px auto 0;padding:0 20px 40px;font-size:13px;color:var(--soft);text-align:center}
+@media print{
+  body{background:#fff}
+  .topbar,aside.toc,#toTop,#progress,.quiz button{display:none}
+  .layout{display:block;max-width:none;padding:0}
+  main{border:none;box-shadow:none;padding:0}
+  figure.fig{break-inside:avoid}
+}
+
+/* ===================== [CHAPTER §6.3] 章级附加（不改动上面的类名与语义） ===================== */
+
+/* 封面徽章：hero > .chips > span.chip（有机化学库已用，勿改名） */
+.hero .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.hero .chip{background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;
+  padding:4px 13px;font-size:13.5px;color:var(--ink);white-space:nowrap}
+
+/* 章级显式目录（源片段自带 nav.toc 时才出现；模板自带的目录仍是冻结的 aside.toc#toc） */
+nav.toc{position:sticky;top:64px;max-height:calc(100vh - 88px);overflow:auto;
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px 14px;box-shadow:var(--shadow);font-size:14.2px}
+nav.toc h3{margin:4px 0 10px;font-size:12px;letter-spacing:.12em;color:var(--soft);text-transform:uppercase}
+nav.toc a{display:block;padding:4px 9px;border-radius:8px;color:var(--ink);text-decoration:none;line-height:1.5}
+nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+nav.toc a.lv1{font-weight:700;margin-top:6px}
+nav.toc a.lv2{padding-left:20px;font-size:13.4px}
+nav.toc a.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+nav.toc .sep{height:1px;background:var(--line);margin:8px 4px}
+@media (max-width:1060px){nav.toc{position:static;max-height:340px}}
+
+/* 一句话抓住 / 必记 / 速查卡（有机化学库既有类名） */
+.key{border-left:5px solid var(--accent);background:var(--card-2);border-radius:0 10px 10px 0;
+  padding:13px 18px;margin:18px 0;font-weight:600}
+.must{background:var(--warn-bg);border:1px solid var(--line);border-radius:10px;padding:13px 18px;margin:18px 0}
+.must .calt{display:block;font-weight:800;color:var(--warn);margin-bottom:3px}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:22px 0}
+.map a{display:block;text-decoration:none;color:inherit;border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;background:var(--card);transition:.16s}
+.map a:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.map .n{font-size:12.5px;color:var(--accent);font-weight:800;letter-spacing:.06em}
+.map .t{font-size:17px;font-weight:700;margin:3px 0 5px}
+.map .d{font-size:13.6px;color:var(--soft);line-height:1.65}
+
+/* 内联 SVG 图（figure.fig.svgfig，不进灯箱——冻结契约只绑 figure.fig img） */
+figure.fig.svgfig{background:var(--card);padding:10px 10px 0}
+figure.fig.svgfig svg{display:block;width:100%;height:auto}
+.figtag{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:5px;
+  padding:0 6px;font-size:12.5px;font-weight:700;margin-right:6px}
+
+/* 章末综合卷：.paperhead > #paperScore + [data-resetpaper] */
+.paperhead{position:sticky;top:64px;z-index:40;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;border-radius:12px;padding:12px 18px;margin:18px 0 6px;display:flex;
+  align-items:center;gap:14px;flex-wrap:wrap;font-size:15px;box-shadow:var(--shadow)}
+.paperhead .big{font-size:20px;font-weight:800;letter-spacing:.02em}
+.paperhead button.reset{font:inherit;font-size:13.5px;padding:6px 14px;border-radius:999px;cursor:pointer;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);color:#fff}
+.paperhead button.reset:hover{background:rgba(255,255,255,.28)}
+.paper{border:1px solid var(--line);border-radius:14px;padding:6px 16px 14px;background:var(--card-2);margin:0 0 22px}
+.paper .quiz{background:var(--card)}
+.quiztitle{font-size:17px;margin:26px 0 4px;color:var(--ink)}
+
+/* 章级测验（有机化学 quiz() 形态：.q[data-a] + .opt 即时判分）
+   与冻结的 .q[data-group] 形态互不干扰：两套 JS 选择器不相交。 */
+.quiz .q[data-a]{border:1px solid var(--line);border-radius:12px;padding:15px 17px;margin:13px 0;background:var(--card)}
+.quiz .q[data-a].done{background:var(--card-2)}
+.stem{display:flex;gap:11px;font-weight:600;line-height:1.75}
+.qno{flex:0 0 25px;height:25px;border-radius:50%;background:var(--accent);color:#fff;display:grid;
+  place-items:center;font-size:13px;margin-top:5px;font-weight:700}
+.opts{margin:11px 0 0;display:grid;gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1px solid var(--line);
+  background:var(--card);border-radius:9px;padding:9px 13px;cursor:pointer;font:inherit;color:inherit;
+  line-height:1.7;transition:.14s;width:100%}
+.opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.opt .k{flex:0 0 22px;height:22px;border-radius:6px;background:var(--accent-soft);color:var(--ink);display:grid;
+  place-items:center;font-size:12.5px;font-weight:800;margin-top:2px}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);color:#fff}
+.q[data-a].done .opt{cursor:default}
+.q[data-a].done .opt:hover{border-color:var(--line);background:var(--card)}
+.q[data-a].done .opt.ok:hover{border-color:var(--ok);background:var(--ok-bg)}
+.q[data-a].done .opt.bad:hover{border-color:var(--bad);background:var(--bad-bg)}
+.q[data-a] .sol{display:none;margin-top:12px;padding:11px 14px;border-radius:9px;background:var(--card-2);
+  border:1px dashed var(--line);font-size:15.2px;line-height:1.8}
+.q[data-a].done .sol{display:block}
+.q[data-a] .sol b{color:var(--ok)}
+.solsep{color:var(--soft);margin:0 7px}
+.quizbar{margin:10px 0 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.quizbar .reset{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 13px;
+  font:inherit;font-size:13.6px;color:var(--ink);cursor:pointer}
+.quizbar .reset:hover{border-color:var(--accent);color:var(--accent)}
+.quizbar .score{font-size:14px;color:var(--soft);margin-left:auto}
+.quizbar .score b{color:var(--ink)}
+
+/* 章级打印补充：答案/解析在纸上要看得见 */
+@media print{
+  .paperhead,.quizbar,.reset{display:none!important}
+  .q .expl,.q[data-a] .sol{display:block!important}
+  h2{break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="topbar">
+  <div class="tb-inner">
+    <div class="tb-title">{{TITLE}}<span id="tbSub"></span></div>
+    <div class="tb-actions">
+      <button id="tocBtn" type="button">目录</button>
+      <button id="topBtn" type="button">回到顶部</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc" id="toc"><h2>目录 CONTENTS</h2><ol></ol></aside>
+  <main id="content">
+    <div class="hero">
+      <h1>{{TITLE}}</h1>
+      <p class="sub">{{SUBTITLE}}</p>
+      <p class="meta">{{META}}</p>
+{{CHIPS}}
+    </div>
+{{CONTENT}}
+  </main>
+</div>
+
+<footer class="bot">构建于 {{BUILT}} · 正文取自讲解记录 · 页图来自课堂课件，已内嵌（单文件、离线可看）</footer>
+<button id="toTop" type="button" title="回到顶部">↑</button>
+<div id="lightbox"><img alt=""></div>
+
+<!-- [FROZEN §6.2] 逐字继承自 心理库 10 讲解 HTML/L06 产物的模板；改它等于改契约。 -->
+<script>
+(function(){
+  var main=document.getElementById('content'), toc=document.getElementById('toc');
+  var sub=document.getElementById('tbSub');
+  var subEl=document.querySelector('.hero .sub');
+  if(subEl&&sub) sub.textContent=' · '+subEl.textContent.trim();
+
+  /* 目录：h3 嵌在所属 h2 下 */
+  var heads=[].slice.call(main.querySelectorAll('h2,h3'));
+  var links=[];
+  if(heads.length){
+    var ol=toc.querySelector('ol'), cur=ol;
+    heads.forEach(function(h,i){
+      if(!h.id) h.id='sec-'+(i+1);
+      var li=document.createElement('li'), a=document.createElement('a');
+      a.href='#'+h.id; a.textContent=h.textContent.replace(/^#+\s*/,'');
+      li.appendChild(a);
+      if(h.tagName==='H3'){ li.style.fontSize='13.5px'; cur.appendChild(li); }
+      else{ ol.appendChild(li); var s=document.createElement('ol'); li.appendChild(s); cur=s; }
+      links.push({a:a,el:h});
+    });
+  }
+
+  /* 滚动高亮 + 进度条 + 回顶按钮 */
+  var toTop=document.getElementById('toTop'), bar=document.getElementById('progress');
+  function onScroll(){
+    var y=window.scrollY||document.documentElement.scrollTop;
+    var h=document.documentElement.scrollHeight-window.innerHeight;
+    bar.style.width=(h>0?(y/h*100):0)+'%';
+    if(y>500) toTop.classList.add('show'); else toTop.classList.remove('show');
+    var cur=null;
+    for(var i=0;i<links.length;i++){ if(links[i].el.getBoundingClientRect().top<=120) cur=links[i]; else break; }
+    links.forEach(function(l){ l.a.classList.toggle('active', l===cur); });
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  onScroll();
+  toTop.addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById('topBtn').addEventListener('click',function(){ window.scrollTo({top:0,behavior:'smooth'}); });
+  document.getElementById('tocBtn').addEventListener('click',function(){
+    var t=toc.getBoundingClientRect().top+window.scrollY-70;
+    window.scrollTo({top:t,behavior:'smooth'});
+  });
+
+  /* 表格包一层，窄屏可横向滚动 */
+  main.querySelectorAll('table.tbl').forEach(function(t){
+    if(t.parentElement&&t.parentElement.classList.contains('tblwrap')) return;
+    var w=document.createElement('div'); w.className='tblwrap';
+    t.parentNode.insertBefore(w,t); w.appendChild(t);
+  });
+
+  /* 图片点击放大 */
+  var lb=document.getElementById('lightbox'), lbImg=lb.querySelector('img');
+  main.querySelectorAll('figure.fig img').forEach(function(img){
+    img.addEventListener('click',function(){ lbImg.src=img.src; lb.classList.add('show'); });
+  });
+  lb.addEventListener('click',function(){ lb.classList.remove('show'); lbImg.src=''; });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') lb.classList.remove('show'); });
+
+  /* 测验判分 */
+  document.querySelectorAll('.quiz').forEach(function(quiz){
+    var score=quiz.querySelector('.score');
+    var btn=quiz.querySelector('button.grade');
+    var reset=quiz.querySelector('button.ghost');
+    var qs=quiz.querySelectorAll('.q');
+    var head=quiz.querySelector('.qhead');
+    if(!head){
+      head=document.createElement('div'); head.className='qhead';
+      var t=document.createElement('div'); t.className='qtitle';
+      var prev=quiz.previousElementSibling;
+      while(prev && !/^H[234]$/.test(prev.tagName)) prev=prev.previousElementSibling;
+      t.textContent=(prev?prev.textContent.replace(/^#+\s*/,'').slice(0,40):'随堂测验');
+      var p0=document.createElement('div'); p0.className='qprog';
+      head.appendChild(t); head.appendChild(p0);
+      quiz.insertBefore(head, quiz.firstChild);
+    }
+    if(head){
+      var prog=head.querySelector('.qprog');
+      if(prog) prog.textContent='共 '+qs.length+' 题 · 已答 0';
+      quiz.addEventListener('change',function(){
+        var done=0;
+        qs.forEach(function(q){
+          var g=q.dataset.group;
+          if(q.querySelector('input[name="'+g+'"]:checked')) done++;
+        });
+        if(prog) prog.textContent='共 '+qs.length+' 题 · 已答 '+done;
+      });
+    }
+    function grade(){
+      var ok=0,total=0;
+      qs.forEach(function(q){
+        total++;
+        var g=q.dataset.group, ans=q.dataset.answer;
+        q.querySelectorAll('label').forEach(function(l){l.classList.remove('ok','bad');});
+        var sel=q.querySelector('input[name="'+g+'"]:checked');
+        var right=q.querySelector('input[value="'+ans+'"]');
+        if(sel&&sel.value===ans){ sel.closest('label').classList.add('ok'); ok++; }
+        else if(sel){ sel.closest('label').classList.add('bad'); if(right) right.closest('label').classList.add('ok'); }
+        else if(right){ right.closest('label').classList.add('ok'); }
+        q.classList.add('revealed');
+      });
+      if(score) score.textContent='得分：'+ok+' / '+total;
+    }
+    function clear(){
+      quiz.querySelectorAll('input[type=radio]').forEach(function(i){i.checked=false;});
+      quiz.querySelectorAll('label').forEach(function(l){l.classList.remove('ok','bad');});
+      qs.forEach(function(q){q.classList.remove('revealed');});
+      if(score) score.textContent='';
+      var prog=head&&head.querySelector('.qprog');
+      if(prog) prog.textContent='共 '+qs.length+' 题 · 已答 0';
+    }
+    if(btn) btn.addEventListener('click',grade);
+    if(reset) reset.addEventListener('click',clear);
+  });
+})();
+</script>
+
+<!-- [CHAPTER §6.3] 章级附加：① .paper + #paperScore + [data-resetpaper] ② .q[data-a] 即时判分
+     ③ 源片段自带 nav.toc 时的 spy() 高亮。选择器与上面的冻结块不相交，不会互相触发。 -->
+<script>
+(function(){
+  function answerOf(q){ return q.dataset.answer!==undefined ? q.dataset.answer : q.dataset.a; }
+  function isDone(q){ return q.classList.contains('revealed')||q.classList.contains('done'); }
+  function pickedOf(q){
+    if(q.dataset.a!==undefined) return q.__picked;
+    var sel=q.querySelector('input[type=radio]:checked');
+    return sel?parseInt(sel.value,10):undefined;
+  }
+  function eachQs(sel,fn){ Array.prototype.slice.call(document.querySelectorAll(sel)).forEach(fn); }
+
+  /* ① 章末综合卷计分 */
+  function recal(){
+    var paper=document.querySelector('.paper'); if(!paper) return;
+    var el=document.getElementById('paperScore'); if(!el) return;
+    var qs=paper.querySelectorAll('.q'), done=0, right=0;
+    Array.prototype.slice.call(qs).forEach(function(q){
+      if(!isDone(q)) return;
+      done++;
+      if(String(pickedOf(q))===String(answerOf(q))) right++;
+    });
+    var pct=done?Math.round(right/done*100):0;
+    el.innerHTML='<span class="big">'+right+' / '+qs.length+'</span>'
+      +'　已作答 '+done+' 题'+(done?'　正确率 '+pct+'%':'');
+  }
+  function resetPaper(){
+    eachQs('.paper .q',function(q){
+      q.classList.remove('done','revealed'); q.__picked=undefined;
+      q.querySelectorAll('.opt').forEach(function(o){o.classList.remove('ok','bad');});
+      q.querySelectorAll('label').forEach(function(l){l.classList.remove('ok','bad');});
+      q.querySelectorAll('input[type=radio]').forEach(function(i){i.checked=false;});
+    });
+    eachQs('.paper .quiz .score',function(s){s.textContent='';});
+    eachQs('.paper .quiz .qprog',function(p){p.textContent='共 '+p.parentElement.parentElement.querySelectorAll('.q').length+' 题 · 已答 0';});
+    recal();
+  }
+
+  /* ② .q[data-a]（有机化学 quiz() 形态）：点选项即时判分 */
+  function gradeA(q,picked){
+    if(q.classList.contains('done')) return;
+    q.classList.add('done');
+    var a=parseInt(q.dataset.a,10);
+    Array.prototype.slice.call(q.querySelectorAll('.opt')).forEach(function(o,i){
+      if(i===a) o.classList.add('ok');
+      else if(i===picked) o.classList.add('bad');
+    });
+    var grp=q.closest('.quiz');
+    if(grp) updateScoreA(grp);
+    recal();
+  }
+  function updateScoreA(grp){
+    var key=grp.dataset.group||'';
+    var sc=grp.querySelector('.score[data-for="'+key+'"]')
+        || (grp.parentElement&&grp.parentElement.querySelector('.score[data-for="'+key+'"]'));
+    if(!sc) return;
+    var all=grp.querySelectorAll('.q').length,
+        done=grp.querySelectorAll('.q.done').length, right=0;
+    Array.prototype.slice.call(grp.querySelectorAll('.q.done')).forEach(function(x){
+      if(String(x.__picked)===String(x.dataset.a)) right++;
+    });
+    sc.innerHTML=done?'已答 <b>'+done+'/'+all+'</b>　答对 <b>'+right+'</b>':'这一组还没开始作答';
+    /* 冻结块的 .qhead 进度条只认 radio；章级 .q[data-a] 由这里同步，避免一直显示「已答 0」 */
+    var prog=grp.querySelector('.qhead .qprog');
+    if(prog) prog.textContent='共 '+all+' 题 · 已答 '+done;
+  }
+
+  document.addEventListener('click',function(e){
+    var o=e.target.closest('.opt');
+    if(o){
+      var q=o.closest('.q');
+      if(!q||q.dataset.a===undefined||q.classList.contains('done')) return;
+      var opts=q.querySelectorAll('.opt');
+      q.__picked=Array.prototype.indexOf.call(opts,o);
+      gradeA(q,q.__picked);
+      return;
+    }
+    var r=e.target.closest('[data-reset]');
+    if(r){
+      var grp=r.closest('.quiz');
+      if(grp){
+        Array.prototype.slice.call(grp.querySelectorAll('.q')).forEach(function(x){
+          x.classList.remove('done'); x.__picked=undefined;
+          x.querySelectorAll('.opt').forEach(function(y){y.classList.remove('ok','bad');});
+        });
+        updateScoreA(grp); recal();
+      }
+      return;
+    }
+    if(e.target.closest('[data-resetpaper]')){ resetPaper(); return; }
+    /* 冻结块的交卷按钮在 button 级监听器里先跑，这里在冒泡阶段兜底更新综合卷计分 */
+    if(e.target.closest('.paper button.grade')||e.target.closest('.paper button.ghost')) recal();
+  });
+  document.addEventListener('change',function(e){
+    if(e.target.closest('.paper')) recal();
+  });
+  recal();
+
+  /* ③ 源片段自带 nav.toc 时的高亮（模板自带目录仍是冻结的 aside.toc#toc） */
+  var nlinks=Array.prototype.slice.call(document.querySelectorAll('nav.toc a[data-id]'));
+  if(nlinks.length){
+    var targets=nlinks.map(function(a){ return document.getElementById(a.dataset.id); });
+    (function spy(){
+      var y=window.pageYOffset+140, best=0;
+      targets.forEach(function(t,i){ if(t&&t.offsetTop<=y) best=i; });
+      nlinks.forEach(function(a,i){ a.classList.toggle('on', i===best); });
+    })();
+    window.addEventListener('scroll',function(){
+      var y=window.pageYOffset+140, best=0;
+      targets.forEach(function(t,i){ if(t&&t.offsetTop<=y) best=i; });
+      nlinks.forEach(function(a,i){ a.classList.toggle('on', i===best); });
+    },{passive:true});
+  }
+})();
+</script>
+</body>
+</html>
